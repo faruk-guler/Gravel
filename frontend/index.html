@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gravel</title>
+  <link rel="icon" type="image/png" sizes="320x320" href="/gravel-icon.png" />
+  <script>try {
+    // Preferences were stored under the previous product name; move them over
+    // once so a rename never resets the theme, font size or pane width.
+    ['theme', 'termFontSize', 'followTerminalFolder', 'showHidden', 'paneWidth'].forEach(function (k) {
+      var old = localStorage.getItem('bedrock.' + k);
+      if (old !== null && localStorage.getItem('gravel.' + k) === null) localStorage.setItem('gravel.' + k, old);
+      if (old !== null) localStorage.removeItem('bedrock.' + k);
+    });
+    document.documentElement.dataset.theme = localStorage.getItem('gravel.theme') || 'dark';
+    var w = parseInt(localStorage.getItem('gravel.paneWidth') || '', 10);
+    if (w >= 320 && w <= 900) document.documentElement.style.setProperty('--pane-w', w + 'px');
+  } catch (e) { console.error('bootstrap:', e) }</script>
+  <script type="module" src="/src/main.js" defer></script>
+</head>
+<body>
+  <div id="app">
+    <nav id="topnav">
+      <button class="navitem active" data-view="session" title="Sessions">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></svg>
+        <span>Sessions</span>
+      </button>
+      <button class="navitem" data-view="terminal" title="Terminals">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 7 9 11 5 15"/><line x1="12" y1="16" x2="19" y2="16"/></svg>
+        <span>Terminals</span>
+      </button>
+      <button class="navitem" data-view="tunnels" title="Tunnels">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 016 6l-1 1"/><path d="M13 18l-1 1a4 4 0 01-6-6l1-1"/></svg>
+        <span>Tunnels</span>
+      </button>
+      <button class="navitem" data-view="settings" title="Settings">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h.01a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+      <button class="navitem" data-view="logs" title="Logs">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="13" y2="16"/></svg>
+        <span>Logs</span>
+      </button>
+      <button class="navitem" data-view="about" title="About">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="8" r="0.6" fill="currentColor"/></svg>
+        <span>About</span>
+      </button>
+      <span class="spacer"></span>
+      <!-- Sliding theme switch. The thumb position and the highlighted label are
+           driven purely by data-theme in CSS, so JS only records the choice. -->
+      <div id="themeToggle" class="themeToggle" role="group" aria-label="Theme">
+        <span class="thumb" aria-hidden="true"></span>
+        <button type="button" class="tseg" data-theme="light" title="Light theme">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" transform="translate(12 12)"><line y1="-7.6" y2="-10"/><line y1="7.6" y2="10"/><line x1="-7.6" x2="-10"/><line x1="7.6" x2="10"/><line x1="-5.4" y1="-5.4" x2="-7.1" y2="-7.1"/><line x1="5.4" y1="-5.4" x2="7.1" y2="-7.1"/><line x1="-5.4" y1="5.4" x2="-7.1" y2="7.1"/><line x1="5.4" y1="5.4" x2="7.1" y2="7.1"/></g><circle cx="12" cy="12" r="4.8" fill="currentColor"/></svg>
+          <span>Light</span>
+        </button>
+        <button type="button" class="tseg" data-theme="dark" title="Dark theme">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M19.024 4.883A10 10 0 1 0 19.024 19.117A7.4 7.4 0 1 1 19.024 4.883Z" fill="currentColor" transform="translate(1.5 0)"/></svg>
+          <span>Dark</span>
+        </button>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Session: PuTTY-style - destination on top, stored sessions below with
+           the live sessions docked to the right -->
+      <section id="view-session" class="view active">
+        <div class="sessLayout">
+          <div class="sessWrap">
+          <div class="panel-title">Specify the destination you want to connect to</div>
+          <div class="paramRow">
+            <label class="fld"><span>Host Name (or IP address)</span><input id="svHost" placeholder="192.168.44.145" /></label>
+            <label class="fld portFld"><span>Port</span><input id="svPort" type="number" placeholder="22" /></label>
+          </div>
+          <div class="paramRow">
+            <label class="fld"><span>Connection type</span>
+              <select id="svAuth"><option value="password">SSH (password)</option><option value="key">SSH (private key)</option></select>
+            </label>
+          </div>
+          <div class="fld" id="svKeyWrap" hidden>
+            <span>Private key</span>
+            <div class="row">
+              <input id="svKey" placeholder="choose a private key file" />
+              <button id="btnPickKey" title="Import a private key file">Browse&hellip;</button>
+            </div>
+          </div>
+
+          <div class="sessFoot">
+            <button id="btnConnectServer" class="primary">Connect &rsaquo;</button>
+          </div>
+
+          <div class="panel-title">Load, save or delete a stored session</div>
+          <div class="savedRow">
+            <div class="savedCol">
+              <input id="svName" class="sessNameInput" placeholder="session name" />
+              <ul id="serverList" class="list sessList"></ul>
+            </div>
+            <div class="savedBtns">
+              <button id="btnLoadServer">Load</button>
+              <button id="btnSaveServer">Save</button>
+              <button id="btnDeleteServer" class="danger">Delete</button>
+              <button id="btnImportHosts" title="import hosts from pasted text">Import</button>
+            </div>
+          </div>
+          </div>
+
+          <aside class="sessSide">
+            <div class="panel-title">Active Sessions</div>
+            <ul id="sessionList" class="list"></ul>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Terminal with the SFTP browser docked on its left -->
+      <section id="view-terminal" class="view">
+        <div id="tabs"></div>
+        <div class="termSplit">
+          <aside id="filePane">
+            <div id="fileBar">
+              <button id="btnUp" title="up one directory">..</button>
+              <span id="pathbar">/</span>
+            </div>
+            <div id="paneTools">
+              <button id="btnMkdir" title="create a directory here">New dir</button>
+              <button id="btnNewFile" title="create an empty file here">New file</button>
+              <button id="btnUpload" title="upload a file to this directory">Upload</button>
+              <button id="btnRefresh" title="reload this directory">Refresh</button>
+            </div>
+            <div id="rows"><table><thead><tr><th>Name</th><th class="sz">Size</th><th class="dt">Last modified</th><th class="ow">Owner</th><th class="gr">Group</th><th class="pm">Access</th><th class="ops"></th></tr></thead><tbody id="tbody"></tbody></table></div>
+            <div id="queueDock">
+              <div class="panel-title">Transfer Queue <button id="btnQueueClear" class="qc">Clear finished</button></div>
+              <ul id="queueList" class="list queue"></ul>
+            </div>
+            <div id="paneFoot">
+              <label class="chk"><input type="checkbox" id="followTerm" checked /> Follow terminal folder</label>
+              <label class="chk"><input type="checkbox" id="showHidden" /> Show hidden</label>
+            </div>
+          </aside>
+          <div id="splitter" title="Drag to resize the file pane; double-click resets"></div>
+          <div id="termWrap"><div id="term"></div></div>
+        </div>
+      </section>
+
+      <!-- Tunnels -->
+      <section id="view-tunnels" class="view">
+        <div class="panel-title">Port forwards (-L / -D)</div>
+        <div id="tunnelRows"><table><thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Forward port</th><th>Destination server</th><th>SSH server</th><th>Actions</th></tr></thead><tbody id="tunnelBody"></tbody></table></div>
+        <div id="tunnelForm" class="form inline" hidden>
+          <select id="tType">
+            <option value="local">Local (-L)</option>
+            <option value="dynamic">Dynamic (SOCKS -D)</option>
+          </select>
+          <select id="tBind" title="who may connect to the local port">
+            <option value="local">This device (127.0.0.1)</option>
+            <option value="lan">LAN (0.0.0.0)</option>
+          </select>
+          <input id="tName" placeholder="name (optional)" />
+          <input id="tLocal" placeholder="local port" type="number" />
+          <input id="tHost" placeholder="remote host" />
+          <input id="tPort" placeholder="remote port" type="number" />
+          <button id="btnAddTunnel" class="primary">Add</button>
+          <button id="btnCancelTunnel">Cancel</button>
+        </div>
+        <div id="tunnelTools" class="form inline">
+          <button id="btnNewTunnel" class="primary">+ New tunnel</button>
+          <button id="btnStartAllTunnels">Start all tunnels</button>
+          <button id="btnStopAllTunnels" class="danger">Stop all tunnels</button>
+        </div>
+      </section>
+
+      <!-- Settings: app-wide preferences in one place. Theme and the file-pane
+           toggles live with the surfaces they control, so only what has no
+           other home belongs here. -->
+      <section id="view-settings" class="view">
+        <div class="panel-title">Settings</div>
+        <div class="settingsWrap">
+          <div class="settingsGroup">
+            <div class="sgTitle">Terminal</div>
+            <div class="setRow">
+              <span class="lbl">Font size</span>
+              <input id="setTermFont" type="range" min="10" max="28" step="1" />
+              <output id="setTermFontVal">14 px</output>
+            </div>
+          </div>
+          <div class="settingsGroup">
+            <div class="sgTitle">Preferences</div>
+            <div class="setRow">
+              <span class="lbl">Everything</span>
+              <button id="setResetAll" title="restore all settings and clear saved preferences">Reset to defaults</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Logs: the in-app view of everything the backend a.log() writes -->
+      <section id="view-logs" class="view">
+        <div class="logsBar">
+          <div class="panel-title">Application log</div>
+          <span class="spacer"></span>
+          <label class="chk"><input type="checkbox" id="logFollow" checked /> Follow</label>
+          <button id="btnLogDump" title="save this session's log to a file">Dump</button>
+          <button id="btnLogRefresh">Refresh</button>
+          <button id="btnLogClear">Clear view</button>
+        </div>
+        <pre id="logBox" class="logBox"></pre>
+      </section>
+
+      <!-- About: the wordmark art on top, then a label/value list. The logo
+           already carries the product name, so no heading repeats it. -->
+      <section id="view-about" class="view">
+        <div class="about">
+          <div class="aboutBody">
+            <!-- Inside the text block so it shares the text's left margin. -->
+            <img class="about-logo" src="/gravel-logo.png" alt="Gravel logo" width="200" height="200" />
+            <h2>About</h2>
+            <p class="aboutSub">A PuTTY + WinSCP hybrid for Linux servers.</p>
+            <div class="aboutRows">
+              <span class="k">Author</span><span><a href="#" data-url="https://github.com/faruk-guler">faruk-guler</a></span>
+              <span class="k">Website</span><span><a href="#" data-url="https://www.farukguler.com">www.farukguler.com</a></span>
+              <span class="k">GitHub</span><span><a href="#" data-url="https://github.com/faruk-guler">github.com/faruk-guler</a></span>
+              <span class="k">Version</span><span id="aboutVer">4.6.0</span>
+            </div>
+            <p class="aboutNote">Credentials are never stored. Data lives in %APPDATA%\Gravel.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- TOFU host-key confirmation -->
+  <dialog id="tofu">
+    <h3 style="margin-top:0">First-time SSH host</h3>
+    <p>Host: <b id="tofu_addr"></b></p>
+    <p>Fingerprint: <code id="tofu_fp"></code><br><small id="tofu_kt"></small></p>
+    <p class="warn">Only trust this host if you can verify the fingerprint out-of-band. A man-in-the-middle on the first connection can present any key.</p>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button id="tofuReject">Reject</button>
+      <button id="tofuAccept" class="primary">Trust &amp; Connect</button>
+    </div>
+  </dialog>
+
+  <!-- Host import: paste a list, get saved sessions -->
+  <dialog id="importDlg">
+    <h3 style="margin-top:0">Import hosts</h3>
+    <p style="margin:0 0 8px;font-size:12px;color:var(--muted)">One per line: <code>host</code>, <code>host:port</code> or <code>name host</code>. Blank and # lines are skipped; an existing name is updated, not duplicated. Or load the list from a file - or re-pull PuTTY's saved sessions.</p>
+    <textarea id="importText" rows="8" placeholder="web1 192.168.44.10&#10;192.168.44.11:2222&#10;db-prod, 10.0.0.5"></textarea>
+    <div class="row" style="justify-content:flex-end;margin-top:12px">
+      <button id="importPutty" title="import sessions saved by PuTTY (registry)">From PuTTY</button>
+      <button id="importPickFile" title="load the list from a text file">From file&hellip;</button>
+      <span class="spacer"></span>
+      <button id="importCancel">Cancel</button>
+      <button id="importGo" class="primary">Import</button>
+    </div>
+  </dialog>
+</body>
+</html>

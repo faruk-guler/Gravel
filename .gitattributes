@@ -1,0 +1,15 @@
+# Normalize line endings to LF in the repo to avoid whole-file "not formatted"
+# diffs in gofmt/gopls when editing on Windows.
+* text=auto
+
+*.go   text eol=lf
+*.mod  text eol=lf
+*.sum  text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+
+# Binary assets
+*.png  binary
+*.ico  binary
+*.jpg  binary

@@ -1,0 +1,19 @@
+{
+  "//": "IDE-only settings (Vite and wails build ignore this file). Wails generates wailsjs/go/main/App.js with a // @ts-check header, and its arg1-style wrappers plus window['go'] lookups are untyped by design: with implicit-any checking on, that one generated file reports a hundred TS7006/TS7015 errors. Generated files must not be edited, so the switch is turned off here instead. checkJs stays false so src/main.js, which imports CSS modules, is not type-checked either.",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "allowJs": true,
+    "checkJs": false,
+    "noImplicitAny": false,
+    "strict": false
+  },
+  "include": [
+    "src",
+    "wailsjs"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

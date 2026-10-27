@@ -1,0 +1,19 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "gravel",
+  "outputfilename": "Gravel",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "faruk-guler"
+  },
+  "info": {
+    "productName": "Gravel",
+    "productVersion": "4.6.0",
+    "copyright": "Copyright 2026 faruk-guler",
+    "companyName": "faruk-guler",
+    "comments": "A PuTTY + WinSCP hybrid manager for Linux servers."
+  }
+}

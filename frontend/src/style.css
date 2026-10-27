@@ -1,0 +1,346 @@
+/* Dark is the default; the light block overrides every colour below. The
+   terminal theme is read from --bg/--fg/--accent in main.js, so this stays the
+   single source of truth for both. */
+:root {
+  --bg: #1e1e1e;
+  --fg: #e0e0e0;
+  --fg-strong: #ffffff;
+  --accent: #7c8cff;
+  --accent2: #3fb45c;
+  --panel: #252526;
+  --border: #3a3a3a;
+  --muted: #8a8a8a;
+  --app-bg: #141414;
+  --chrome: #101010;
+  --surface: #171717;
+  --hover: #262627;
+  --selected: #23233a;
+  --row-line: #2a2a2a;
+  --tab-bg: #1a1a1a;
+  --tab-active-bg: #2d2d30;
+  --nav-fg: #c9c9c9;
+  --link: #9cdcfe;
+  --danger: #ef6b6b;
+  --warn: #e6c229;
+  --msg-fg: #f66;
+  --primary-bg: #263055;
+  --dot-idle: #888888;
+  --code-bg: #111111;
+  --qbar-from: #2c6e3f;
+  --backdrop: rgba(0, 0, 0, 0.6);
+  /* Width of the docked file pane; overridden from localStorage before paint. */
+  --pane-w: 720px;
+}
+
+/* Light theme: a dim paper ramp, not white. The user asked for it noticeably
+   darker than a normal light theme so it stays comfortable to read; the order
+   page < card < field/terminal keeps panels legible as layers. */
+:root[data-theme="light"] {
+  --bg: #eceae4;
+  --fg: #1f1f1c;
+  --fg-strong: #101010;
+  --accent: #3a55cc;
+  --accent2: #1a7a34;
+  --panel: #eae8e2;
+  --border: #b4b3ad;
+  --muted: #5c5c57;
+  --app-bg: #d9d8d2;
+  --chrome: #cbcac4;
+  --surface: #e4e3dd;
+  --hover: #d0cfc9;
+  --selected: #c3cef2;
+  --row-line: #c9c8c2;
+  --tab-bg: #d4d3cd;
+  --tab-active-bg: #eceae4;
+  --nav-fg: #3a3a36;
+  --link: #0a4a86;
+  --danger: #b32121;
+  --warn: #8a6208;
+  --msg-fg: #b32121;
+  --primary-bg: #ccd6f2;
+  --dot-idle: #7e7e79;
+  --code-bg: #d6d5cf;
+  --qbar-from: #3f9a45;
+  --backdrop: rgba(0, 0, 0, 0.42);
+}
+* { box-sizing: border-box; }
+/* .form sets display:flex, which would otherwise beat the browser's own
+   [hidden] rule and leave the collapsed tunnel form on screen. */
+[hidden] { display: none !important; }
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--app-bg); color: var(--fg); }
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* top navigation */
+#topnav { display: flex; align-items: center; gap: 4px; padding: 6px 12px; background: var(--chrome); border-bottom: 1px solid var(--border); }
+.navitem { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 66px; padding: 6px 8px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--nav-fg); font-size: 12px; cursor: pointer; }
+.navitem:hover { background: var(--hover); }
+.navitem.active { background: var(--selected); border-color: var(--accent); color: var(--fg-strong); }
+.navitem.active svg { color: var(--accent); }
+.spacer { flex: 1; }
+
+/* Theme switch: two equal segments in a pill with a thumb that slides behind the
+   active one. data-theme on <html> is the only state - the thumb position and
+   the label colours follow it in CSS, so JS never toggles a class. */
+.themeToggle { position: relative; display: flex; margin-left: 8px; padding: 3px; background: var(--panel); border: 1px solid var(--border); border-radius: 9px; }
+.themeToggle .thumb { position: absolute; top: 3px; left: 3px; width: calc(50% - 3px); height: calc(100% - 6px); border-radius: 7px; background: var(--selected); border: 1px solid var(--accent); transition: transform .18s ease; pointer-events: none; }
+:root[data-theme="dark"] .themeToggle .thumb { transform: translateX(100%); }
+.tseg { position: relative; display: flex; align-items: center; justify-content: center; gap: 5px; flex: 0 0 82px; padding: 4px 0; background: none; border: none; border-radius: 7px; color: var(--muted); font-size: 12px; cursor: pointer; }
+.tseg:hover { color: var(--fg); }
+:root[data-theme="light"] .tseg[data-theme="light"],
+:root[data-theme="dark"] .tseg[data-theme="dark"] { color: var(--fg-strong); }
+
+/* views */
+main { flex: 1; min-height: 0; position: relative; }
+.view { display: none; height: 100%; overflow: auto; }
+.view.active { display: block; }
+#view-terminal.active { display: flex; flex-direction: column; overflow: hidden; }
+
+/* logs */
+#view-logs.active { display: flex; flex-direction: column; overflow: hidden; }
+.logsBar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--surface); flex: 0 0 auto; }
+.logsBar .panel-title { padding: 0; border-bottom: none; }
+.logsBar button { flex: 0 0 auto; }
+.logBox { flex: 1; min-height: 0; margin: 0; padding: 10px 12px; overflow: auto; font-family: Consolas, monospace; font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-all; color: var(--fg); }
+
+.panel-title { padding: 8px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border-bottom: 1px solid var(--border); }
+
+/* session view: PuTTY-style form on the left, live sessions docked right */
+#view-session .sessLayout { display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start; padding: 18px 26px 40px; }
+#view-session .sessWrap { flex: 0 1 620px; min-width: 0; max-width: 620px; margin: 0; padding: 0; }
+#view-session .panel-title { padding-left: 0; padding-right: 0; }
+/* The side panel sticks near the top so it stays visible while the stored
+   session list scrolls on long afternoons. */
+.sessSide { flex: 1 1 300px; min-width: 280px; max-width: 460px; position: sticky; top: 8px; }
+#sessionList { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); max-height: 320px; }
+/* A small breath under each heading's rule, so "HOST NAME" doesn't sit glued
+   to the border the way it did - the same gap the stored-session box gets. */
+#view-session .panel-title { margin-bottom: 8px; }
+.sessNameInput { width: 100%; }
+.savedRow { display: flex; gap: 12px; align-items: stretch; margin: 10px 0 20px; }
+/* PuTTY puts the session-name box directly above the list, sharing its column; 
+   the Load/Save/Delete buttons stretch to the combined height beside it. */
+.savedCol { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+/* PuTTY's list box keeps a tall frame: with few rows the empty space sits
+   inside the border, below the entries. It now follows the window height rather
+   than a fixed 280px so the column reaches the bottom of the page (and the
+   Import button with it), with a floor for short windows. flex-shrink is off so
+   the column cannot squeeze the box down to its content; many rows scroll. */
+.sessList { flex: 1 0 auto; height: calc(100vh - 575px); min-height: 320px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); overflow-y: auto; }
+.savedBtns { display: flex; flex-direction: column; gap: 8px; width: 100px; flex: 0 0 auto; }
+.savedBtns button { width: 100%; }
+/* Import is a rare bulk action, not part of the day-to-day Load/Save/Delete
+   trio - drop it to the bottom of the column, flush with the list. */
+#btnImportHosts { margin-top: auto; }
+.paramRow { display: flex; gap: 12px; }
+.paramRow .fld { flex: 1; margin-bottom: 12px; }
+.paramRow .portFld { flex: 0 0 120px; }
+#svKeyWrap { margin-bottom: 12px; }
+#svKeyWrap .row input { flex: 1; min-width: 0; }
+#svKeyWrap .row button { flex: 0 0 auto; }
+.sessFoot { margin: 6px 0 24px; }
+#btnConnectServer { min-width: 150px; }
+.list { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
+.list li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+/* Drag-and-drop reorder of saved servers: the row being moved fades, the row
+   under the cursor shows an accent line where the drop will land. */
+.sessList li.dragging { opacity: .4; }
+.sessList li.dropon { box-shadow: inset 0 2px 0 var(--accent); }
+.list li:hover { background: var(--hover); }
+.list li.selected { background: var(--selected); }
+.list li .nm { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list li .sub { color: var(--muted); font-size: 11px; }
+.list li .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-idle); }
+.list li .dot.connected { background: var(--accent2); }
+.list li .dot.connecting { background: var(--warn); }
+.list li .dot.failed, .list li .dot.disconnected { background: var(--danger); }
+
+.form { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.form.inline { flex-direction: row; align-items: center; }
+.form.inline input { flex: 1; }
+.row { display: flex; gap: 8px; }
+
+input, select, button { background: var(--panel); color: var(--fg); border: 1px solid var(--border); border-radius: 5px; padding: 7px 9px; font-size: 13px; }
+input, select { width: 100%; }
+button { cursor: pointer; white-space: nowrap; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--primary-bg); border-color: var(--accent); }
+/* Destructive action: red text and border. Hover keeps the red border and only
+   brightens the background - filling with red would drop the label below 4.5:1. */
+button.danger { color: var(--danger); border-color: var(--danger); }
+button.danger:hover { color: var(--danger); background: var(--hover); border-color: var(--danger); }
+
+/* terminal */
+#tabs { display: flex; gap: 2px; padding: 4px 8px 0 8px; background: var(--chrome); border-bottom: 1px solid var(--border); overflow-x: auto; min-height: 30px; flex: 0 0 auto; }
+.tab { display: flex; align-items: center; gap: 6px; background: var(--tab-bg); color: var(--nav-fg); border: 1px solid var(--border); border-bottom: none; border-radius: 5px 5px 0 0; padding: 4px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.tab.active { background: var(--tab-active-bg); color: var(--fg-strong); border-color: var(--accent); }
+.tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot-idle); }
+.tab .dot.connected { background: var(--accent2); }
+.tab .dot.connecting { background: var(--warn); }
+.tab .dot.failed, .tab .dot.disconnected { background: var(--danger); }
+.tab .close { background: none; border: none; color: var(--dot-idle); padding: 0 4px; font-weight: bold; }
+.tab .close:hover { color: var(--danger); }
+/* Placeholder tab shown while a new session is dialling/authenticating. */
+.tab.pending { color: var(--muted); font-style: italic; cursor: default; }
+/* Tab right-click menu (the webview exposes no native context menu). */
+.ctxMenu { position: fixed; z-index: 1000; min-width: 168px; padding: 4px; background: var(--panel); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, .4); }
+.ctxItem { padding: 7px 12px; font-size: 13px; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.ctxItem:hover { background: var(--selected); color: var(--fg-strong); }
+#term { flex: 1; padding: 6px; background: var(--bg); overflow: hidden; min-height: 0; }
+
+/* terminal + docked browser split */
+.termSplit { display: flex; flex: 1; min-height: 0; }
+#termWrap { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+/* min/max mirror PANE_MIN/PANE_MAX in main.js. */
+#filePane { flex: 0 0 var(--pane-w); width: var(--pane-w); min-width: 320px; max-width: 900px; display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--border); background: var(--surface); }
+#splitter { flex: 0 0 6px; cursor: col-resize; background: var(--border); touch-action: none; }
+#splitter:hover, #splitter.dragging { background: var(--accent); }
+body.resizing { user-select: none; cursor: col-resize; }
+
+/* files (inside the docked pane) */
+#fileBar { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--surface); flex: 0 0 auto; }
+#pathbar { flex: 1; min-width: 0; font-family: monospace; font-size: 12px; color: var(--link); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#paneTools { display: flex; gap: 6px; padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--surface); flex: 0 0 auto; }
+#paneTools button { flex: 1; padding: 5px 6px; font-size: 12px; }
+#rows { overflow: auto; flex: 1; min-height: 0; }
+#filePane th, #filePane td { padding: 5px 8px; }
+#filePane td button { padding: 2px 6px; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+/* Fixed layout inside the pane: the name column absorbs the space and
+   ellipsises, instead of the nowrap buttons pushing a horizontal scrollbar in.
+   Below the sum of these widths the table does scroll sideways by design. */
+#filePane table { table-layout: fixed; }
+/* Every column needs an explicit width: with table-layout: fixed an unwidthed
+   column only absorbs leftover space, and when the fixed columns already exceed
+   the pane that leftover goes negative - the Name column collapsed to 0px and
+   filenames disappeared entirely. */
+#filePane th:nth-child(1), #filePane td.name { width: 140px; }
+#filePane th:nth-child(2), #filePane td.sz { width: 54px; }
+/* 112px is what "2026-10-24 23:23" needs at 11px plus the cell's 8px side
+   padding; at 98px the timestamp was ellipsised to "2026-10-24 23…". */
+#filePane th:nth-child(3), #filePane td.dt { width: 112px; }
+#filePane th:nth-child(4), #filePane td.ow { width: 72px; }
+#filePane th:nth-child(5), #filePane td.gr { width: 72px; }
+/* 84px fits ten monospace permission characters plus padding. */
+#filePane th:nth-child(6), #filePane td.pm { width: 84px; }
+/* The action cell must fit download+del+rename plus the 8px side padding and the
+   6px gap before rename; 150px made its content overflow by ~12px. */
+#filePane th:nth-child(7), #filePane td.ops { width: 164px; }
+#filePane td.name { overflow: hidden; text-overflow: ellipsis; }
+#filePane td.dt, #filePane td.ow, #filePane td.gr, #filePane td.pm {
+  color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis;
+}
+#filePane td.pm { font-family: Consolas, monospace; }
+#filePane td.ops { text-align: right; }
+th, td { text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--row-line); white-space: nowrap; }
+th { color: var(--link); font-weight: normal; position: sticky; top: 0; background: var(--surface); }
+td.name { cursor: pointer; }
+td.name:hover { color: var(--accent); }
+td.sz { text-align: right; color: var(--muted); }
+
+/* transfer queue dock (bottom of the browser pane) */
+#queueDock { display: none; flex: 0 0 auto; flex-direction: column; min-height: 0; max-height: 40%; border-top: 1px solid var(--border); background: var(--surface); }
+#queueDock.show { display: flex; }
+#queueDock .list { flex: 1; padding: 0; }
+
+/* pane footer: the follow and show-hidden toggles share one row */
+#paneFoot { flex: 0 0 auto; display: flex; flex-wrap: wrap; border-top: 1px solid var(--border); background: var(--surface); }
+.chk { flex: 0 1 auto; display: flex; align-items: center; gap: 6px; padding: 8px; font-size: 12px; color: var(--muted); white-space: nowrap; cursor: pointer; }
+.chk input { width: auto; }
+.chk:hover { color: var(--fg); }
+
+/* queue */
+/* align-items must be reset: .list li sets `center`, and on a column flex box
+   that shrinks children horizontally - the empty .qbar div collapsed to 0px and
+   the progress bar was invisible. */
+.queue li { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 8px 12px; border-bottom: 1px solid var(--row-line); }
+.queue .qtop { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.queue .qkind { font-size: 11px; text-transform: uppercase; color: var(--muted); width: 70px; }
+.queue .qname { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.queue .qstatus { font-size: 11px; color: var(--muted); }
+.queue .qbar { height: 8px; background: var(--row-line); border-radius: 4px; overflow: hidden; }
+.queue .qbar > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--qbar-from), var(--accent2)); transition: width .15s ease; }
+.queue .qcancel { margin-left: 8px; padding: 2px 8px; font-size: 11px; color: var(--danger); }
+/* Pause and resume share this slot on a queue row, so both read the same. */
+.queue .qpause { margin-left: 8px; padding: 2px 8px; font-size: 11px; }
+.panel-title .qc { padding: 2px 8px; font-size: 11px; margin-left: 8px; text-transform: none; letter-spacing: 0; }
+
+/* about: the wordmark logo and the text block share one centre axis - the
+   column centres its children, and the text keeps a left-aligned block of its
+   own width instead of stretching across the whole column. */
+.about { display: flex; flex-direction: column; align-items: center; max-width: 560px; margin: 0 auto; padding: 40px 24px; line-height: 1.6; }
+/* The artwork carries ~16% transparent padding on each side (measured on the
+   1254px master: 196px left, 201px right), so the box is pulled left by that
+   much at its 200px size. The visible stone then starts on the same margin line
+   as the text under it instead of floating to the right of it. */
+/* The PNG goes on the page as it is: no plate, no border, no rounded box in
+   either theme. The single nudge is the negative left margin that cancels the
+   transparent padding baked into the artwork, so its visible edge lines up with
+   the text below it. */
+.about-logo { display: block; margin: 0 0 22px -31px; }
+.aboutBody { width: 100%; max-width: 420px; text-align: left; }
+.about h2 { margin: 0 0 3px; font-size: 17px; font-weight: 600; color: var(--fg-strong); }
+.aboutSub { margin: 0 0 20px; font-size: 13px; color: var(--muted); }
+.aboutRows { display: grid; grid-template-columns: max-content 1fr; gap: 9px 18px; font-size: 13px; line-height: 1.5; }
+.aboutRows .k { color: var(--muted); }
+.about a { color: var(--link); text-decoration: none; }
+.about a:hover { color: var(--accent); text-decoration: underline; }
+.aboutNote { margin: 24px 0 0; font-size: 12px; line-height: 1.7; color: var(--muted); }
+
+/* tunnels */
+#tunnelRows { overflow: auto; }
+#tunnelRows td { white-space: nowrap; }
+#tunnelRows td.muted { color: var(--muted); }
+#tunnelRows td.run { color: var(--accent2); }
+/* Stopped is a deliberate state, not an error: grey, so red stays reserved for
+   the destructive action. */
+#tunnelRows td.stopped { color: var(--muted); }
+/* Room for start/stop + edit + remove without the auto layout crowding them. */
+#tunnelRows th:last-child, #tunnelRows td.tacts { width: 180px; }
+#tunnelRows td.empty { color: var(--muted); text-align: center; padding: 24px 12px; }
+/* In-row tunnel editing: inputs sit inside the cells they replace, so the row
+   keeps its height and place instead of a second form pushing content down. */
+#tunnelRows td:has(> input.cellEdit), #tunnelRows td.destEdit { padding: 3px 6px; }
+#tunnelRows input.cellEdit { width: 100%; padding: 4px 6px; font-size: 13px; }
+#tunnelRows td.destEdit { display: flex; gap: 6px; }
+#tunnelRows td.destEdit input { flex: 1; min-width: 0; }
+#tunnelRows td.destEdit input.port { flex: 0 0 64px; width: 64px; }
+/* Port + bind pair inside an edited row's Forward-port cell. */
+#tunnelRows td.portEdit { display: flex; gap: 6px; padding: 3px 6px; }
+#tunnelRows td.portEdit input { flex: 1; min-width: 0; }
+#tunnelRows td.portEdit select { flex: 0 0 118px; padding: 4px 6px; font-size: 12px; }
+/* LAN-visible marker in the Forward-port column. */
+#tunnelRows td.lanb { color: var(--accent2); }
+#tunnelForm, #tunnelTools { border-top: 1px solid var(--border); }
+/* The forward-type and bind pickers are fixed-width lead-ins, not stretching fields. */
+#tType { flex: 0 0 170px; }
+#tBind { flex: 0 0 190px; }
+/* The form holds four inputs and two buttons; let it wrap rather than squeeze
+   every field to nothing on a narrow window. */
+#tunnelForm { flex-wrap: wrap; }
+#tunnelForm input { min-width: 110px; }
+#tunnelTools button { flex: 0 0 auto; }
+
+/* settings */
+.settingsWrap { max-width: 720px; padding: 16px 26px 40px; display: flex; flex-direction: column; gap: 20px; }
+.settingsGroup { border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 12px 16px; }
+.sgTitle { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 10px; }
+.setRow { display: flex; align-items: center; gap: 12px; font-size: 13px; padding: 5px 0; cursor: pointer; }
+.setRow .lbl { flex: 0 0 160px; color: var(--fg); }
+.setRow input[type=range] { flex: 1; min-width: 0; padding: 0; height: 24px; }
+.setRow output { flex: 0 0 52px; color: var(--muted); font-size: 12px; text-align: right; }
+
+/* host import dialog */
+#importDlg { min-width: 440px; }
+#importText { width: 100%; background: var(--panel); color: var(--fg); border: 1px solid var(--border); border-radius: 5px; padding: 7px 9px; font-size: 13px; font-family: Consolas, monospace; resize: vertical; }
+
+/* form field: label above its input */
+.fld { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.fld > span { text-transform: uppercase; letter-spacing: .04em; }
+
+/* dialogs */
+dialog { background: var(--panel); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; min-width: 360px; max-width: 520px; }
+dialog::backdrop { background: var(--backdrop); }
+dialog code { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; color: var(--link); word-break: break-all; }
+dialog .warn { color: var(--msg-fg); font-size: 12px; }
+dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
